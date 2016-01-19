@@ -1,50 +1,35 @@
+Index: ogr/ogrsf_frmts/ogrsf_frmts.h
+===================================================================
+--- ogr/ogrsf_frmts/ogrsf_frmts.h	(revision 32732)
++++ ogr/ogrsf_frmts/ogrsf_frmts.h	(working copy)
+@@ -422,6 +422,7 @@
+ void CPL_DLL RegisterOGRCSW();
+ void CPL_DLL RegisterOGRMongoDB();
+ void CPL_DLL RegisterOGRVDV();
++void CPL_DLL RegisterOGRVFP();
+ CPL_C_END
+ 
+ 
 Index: ogr/ogrsf_frmts/GNUmakefile
 ===================================================================
---- ogr/ogrsf_frmts/GNUmakefile	(revision 29629)
+--- ogr/ogrsf_frmts/GNUmakefile	(revision 32732)
 +++ ogr/ogrsf_frmts/GNUmakefile	(working copy)
 @@ -6,7 +6,7 @@
  	mitab ntf gpx rec s57 sdts shape tiger vrt \
  	geoconcept xplane georss gtm dxf pgdump gpsbabel \
  	sua openair pds htf aeronavfaa edigeo svg idrisi \
--	arcgen segukooa segy sxf openfilegdb wasp selafin jml idf
-+	arcgen segukooa segy sxf openfilegdb wasp selafin jml idf vfp
+-	arcgen segukooa segy sxf openfilegdb wasp selafin jml vdv
++	arcgen segukooa segy sxf openfilegdb wasp selafin jml vdv vfp
  
  SUBDIRS-$(HAVE_DODS)	+= dods
  SUBDIRS-$(HAVE_DWGDIRECT) += dxfdwg
-Index: ogr/ogrsf_frmts/generic/GNUmakefile
-===================================================================
---- ogr/ogrsf_frmts/generic/GNUmakefile	(revision 29629)
-+++ ogr/ogrsf_frmts/generic/GNUmakefile	(working copy)
-@@ -55,7 +55,8 @@
- 	-DWASP_ENABLED \
- 	-DSELAFIN_ENABLED \
- 	-DJML_ENABLED \
--	-DIDF_ENABLED
-+	-DIDF_ENABLED \
-+	-DVFP_ENABLED
- 
- CXXFLAGS :=     $(CXXFLAGS) $(BASEFORMATS)
- 
-Index: ogr/ogrsf_frmts/generic/makefile.vc
-===================================================================
---- ogr/ogrsf_frmts/generic/makefile.vc	(revision 29629)
-+++ ogr/ogrsf_frmts/generic/makefile.vc	(working copy)
-@@ -13,7 +13,7 @@
- 
- !IFDEF INCLUDE_OGR_FRMTS
- 
--BASEFORMATS = -DSHAPE_ENABLED -DTAB_ENABLED -DNTF_ENABLED -DSDTS_ENABLED -DTIGER_ENABLED -DS57_ENABLED -DDGN_ENABLED -DVRT_ENABLED -DAVCBIN_ENABLED -DREC_ENABLED -DMEM_ENABLED -DCSV_ENABLED -DGML_ENABLED -DGMT_ENABLED -DBNA_ENABLED -DKML_ENABLED -DGEOJSON_ENABLED -DGPX_ENABLED -DGEOCONCEPT_ENABLED -DXPLANE_ENABLED -DGEORSS_ENABLED -DGTM_ENABLED -DDXF_ENABLED -DPGDUMP_ENABLED -DGPSBABEL_ENABLED -DSUA_ENABLED -DOPENAIR_ENABLED -DPDS_ENABLED -DHTF_ENABLED -DAERONAVFAA_ENABLED -DEDIGEO_ENABLED -DSVG_ENABLED -DIDRISI_ENABLED -DARCGEN_ENABLED -DSEGUKOOA_ENABLED -DSEGY_ENABLED -DSXF_ENABLED -DOPENFILEGDB_ENABLED -DWASP_ENABLED -DSELAFIN_ENABLED -DJML_ENABLED -DIDF_ENABLED
-+BASEFORMATS = -DSHAPE_ENABLED -DTAB_ENABLED -DNTF_ENABLED -DSDTS_ENABLED -DTIGER_ENABLED -DS57_ENABLED -DDGN_ENABLED -DVRT_ENABLED -DAVCBIN_ENABLED -DREC_ENABLED -DMEM_ENABLED -DCSV_ENABLED -DGML_ENABLED -DGMT_ENABLED -DBNA_ENABLED -DKML_ENABLED -DGEOJSON_ENABLED -DGPX_ENABLED -DGEOCONCEPT_ENABLED -DXPLANE_ENABLED -DGEORSS_ENABLED -DGTM_ENABLED -DDXF_ENABLED -DPGDUMP_ENABLED -DGPSBABEL_ENABLED -DSUA_ENABLED -DOPENAIR_ENABLED -DPDS_ENABLED -DHTF_ENABLED -DAERONAVFAA_ENABLED -DEDIGEO_ENABLED -DSVG_ENABLED -DIDRISI_ENABLED -DARCGEN_ENABLED -DSEGUKOOA_ENABLED -DSEGY_ENABLED -DSXF_ENABLED -DOPENFILEGDB_ENABLED -DWASP_ENABLED -DSELAFIN_ENABLED -DJML_ENABLED -DIDF_ENABLED -DVFP_ENABLED
- 
- EXTRAFLAGS =	-I.. -I..\.. $(OGDIDEF) $(FMEDEF) $(OCIDEF) $(PGDEF) \
- 		$(ODBCDEF) $(SQLITEDEF) $(MYSQLDEF) $(ILIDEF) $(DWGDEF) \
 Index: ogr/ogrsf_frmts/generic/ogrregisterall.cpp
 ===================================================================
---- ogr/ogrsf_frmts/generic/ogrregisterall.cpp	(revision 29629)
+--- ogr/ogrsf_frmts/generic/ogrregisterall.cpp	(revision 32732)
 +++ ogr/ogrsf_frmts/generic/ogrregisterall.cpp	(working copy)
-@@ -286,6 +286,9 @@
- #ifdef IDF_ENABLED
-     RegisterOGRIDF();
+@@ -288,6 +288,9 @@
+ #ifdef VDV_ENABLED
+     RegisterOGRVDV();
  #endif
 +#ifdef VFP_ENABLED
 +    RegisterOGRVFP();
@@ -52,16 +37,43 @@ Index: ogr/ogrsf_frmts/generic/ogrregisterall.cpp
  
  /* Put TIGER and AVCBIN at end since they need poOpenInfo->GetSiblingFiles() */
  #ifdef TIGER_ENABLED
+Index: ogr/ogrsf_frmts/generic/makefile.vc
+===================================================================
+--- ogr/ogrsf_frmts/generic/makefile.vc	(revision 32732)
++++ ogr/ogrsf_frmts/generic/makefile.vc	(working copy)
+@@ -13,7 +13,7 @@
+ 
+ !IFDEF INCLUDE_OGR_FRMTS
+ 
+-BASEFORMATS = -DSHAPE_ENABLED -DTAB_ENABLED -DNTF_ENABLED -DSDTS_ENABLED -DTIGER_ENABLED -DS57_ENABLED -DDGN_ENABLED -DVRT_ENABLED -DAVCBIN_ENABLED -DREC_ENABLED -DMEM_ENABLED -DCSV_ENABLED -DGML_ENABLED -DGMT_ENABLED -DBNA_ENABLED -DKML_ENABLED -DGEOJSON_ENABLED -DGPX_ENABLED -DGEOCONCEPT_ENABLED -DXPLANE_ENABLED -DGEORSS_ENABLED -DGTM_ENABLED -DDXF_ENABLED -DPGDUMP_ENABLED -DGPSBABEL_ENABLED -DSUA_ENABLED -DOPENAIR_ENABLED -DPDS_ENABLED -DHTF_ENABLED -DAERONAVFAA_ENABLED -DEDIGEO_ENABLED -DSVG_ENABLED -DIDRISI_ENABLED -DARCGEN_ENABLED -DSEGUKOOA_ENABLED -DSEGY_ENABLED -DSXF_ENABLED -DOPENFILEGDB_ENABLED -DWASP_ENABLED -DSELAFIN_ENABLED -DJML_ENABLED -DVDV_ENABLED
++BASEFORMATS = -DSHAPE_ENABLED -DTAB_ENABLED -DNTF_ENABLED -DSDTS_ENABLED -DTIGER_ENABLED -DS57_ENABLED -DDGN_ENABLED -DVRT_ENABLED -DAVCBIN_ENABLED -DREC_ENABLED -DMEM_ENABLED -DCSV_ENABLED -DGML_ENABLED -DGMT_ENABLED -DBNA_ENABLED -DKML_ENABLED -DGEOJSON_ENABLED -DGPX_ENABLED -DGEOCONCEPT_ENABLED -DXPLANE_ENABLED -DGEORSS_ENABLED -DGTM_ENABLED -DDXF_ENABLED -DPGDUMP_ENABLED -DGPSBABEL_ENABLED -DSUA_ENABLED -DOPENAIR_ENABLED -DPDS_ENABLED -DHTF_ENABLED -DAERONAVFAA_ENABLED -DEDIGEO_ENABLED -DSVG_ENABLED -DIDRISI_ENABLED -DARCGEN_ENABLED -DSEGUKOOA_ENABLED -DSEGY_ENABLED -DSXF_ENABLED -DOPENFILEGDB_ENABLED -DWASP_ENABLED -DSELAFIN_ENABLED -DJML_ENABLED -DVDV_ENABLED -DVFP_ENABLED
+ 
+ EXTRAFLAGS =	-I.. -I..\.. $(OGDIDEF) $(FMEDEF) $(OCIDEF) $(PGDEF) \
+ 		$(ODBCDEF) $(SQLITEDEF) $(MYSQLDEF) $(ILIDEF) $(DWGDEF) \
+Index: ogr/ogrsf_frmts/generic/GNUmakefile
+===================================================================
+--- ogr/ogrsf_frmts/generic/GNUmakefile	(revision 32732)
++++ ogr/ogrsf_frmts/generic/GNUmakefile	(working copy)
+@@ -55,7 +55,8 @@
+ 	-DWASP_ENABLED \
+ 	-DSELAFIN_ENABLED \
+ 	-DJML_ENABLED \
+-	-DVDV_ENABLED
++	-DVDV_ENABLED \
++	-DVFP_ENABLED
+ 
+ CXXFLAGS :=     $(CXXFLAGS) $(BASEFORMATS)
+ 
 Index: ogr/ogrsf_frmts/makefile.vc
 ===================================================================
---- ogr/ogrsf_frmts/makefile.vc	(revision 29629)
+--- ogr/ogrsf_frmts/makefile.vc	(revision 32732)
 +++ ogr/ogrsf_frmts/makefile.vc	(working copy)
 @@ -8,7 +8,7 @@
  			avc rec mem vrt csv gmt bna kml gpx \
  			geoconcept xplane georss gtm dxf pgdump gpsbabel \
  			sua openair pds htf aeronavfaa edigeo svg idrisi arcgen \
--			segukooa segy sxf openfilegdb wasp selafin jml idf \
-+			segukooa segy sxf openfilegdb wasp selafin jml idf vfp \
+-			segukooa segy sxf openfilegdb wasp selafin jml vdv \
++			segukooa segy sxf openfilegdb wasp selafin jml vdv vfp \
  			$(ARCOBJECTS_DIR) \
  			$(OGDIDIR) $(FMEDIR) $(OCIDIR) $(PG_DIR) $(DWGDIR) \
  			$(ODBCDIR) $(SQLITE_DIR) $(MYSQL_DIR) $(ILI_DIR) \
@@ -69,20 +81,8 @@ Index: ogr/ogrsf_frmts/makefile.vc
  				 aeronavfaa\*.obj edigeo\*.obj svg\*.obj idrisi\*.obj \
  				 arcgen\*.obj segukooa\*.obj segy\*.obj sxf\*.obj \
  				 openfilegdb\*.obj wasp\*.obj selafin\*.obj jml\*.obj \
--				 idf\*.obj \
-+				 idf\*.obj vfp\*.obj \
+-				 vdv\*.obj \
++				 vdv\*.obj vfp\*.obj \
  				$(OGDIOBJ) $(ODBCOBJ) $(SQLITE_OBJ) \
  				$(FMEOBJ) $(OCIOBJ) $(PG_OBJ) $(MYSQL_OBJ) \
  				$(ILI_OBJ) $(DWG_OBJ) $(SDE_OBJ) $(FGDB_OBJ) $(ARCDRIVER_OBJ) $(IDB_OBJ) \
-Index: ogr/ogrsf_frmts/ogrsf_frmts.h
-===================================================================
---- ogr/ogrsf_frmts/ogrsf_frmts.h	(revision 29629)
-+++ ogr/ogrsf_frmts/ogrsf_frmts.h	(working copy)
-@@ -421,6 +421,7 @@
- void CPL_DLL RegisterOGRCSW();
- void CPL_DLL RegisterOGRMongoDB();
- void CPL_DLL RegisterOGRIDF();
-+void CPL_DLL RegisterOGRVFP();
- CPL_C_END
- 
- 

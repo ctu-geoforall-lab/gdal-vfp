@@ -1,0 +1,1956 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   !!! INSERT Copyright info HERE !!!
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.hsi.cz/vfp" targetNamespace="http://www.hsi.cz/vfp">
+	<xs:simpleType name="coordinateAttrType">
+		<xs:annotation>
+			<xs:documentation>Složka souřadnice</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:decimal">
+			<xs:fractionDigits value="2"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="coordinateType">
+		<xs:annotation>
+			<xs:documentation>Souřadnice</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="x" type="coordinateAttrType" use="required"/>
+		<xs:attribute name="y" type="coordinateAttrType" use="required"/>
+		<xs:attribute name="z" type="coordinateAttrType" use="optional"/>
+	</xs:complexType>
+	<xs:complexType name="polygonType" abstract="true">
+		<xs:annotation>
+			<xs:documentation>Bázový typ polygonu</xs:documentation>
+		</xs:annotation>
+	</xs:complexType>
+	<xs:complexType name="linpol">
+		<xs:annotation>
+			<xs:documentation>Lineární polygon</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="polygonType">
+				<xs:sequence>
+					<xs:element name="segment" type="segmentType" maxOccurs="unbounded"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="linearType">
+		<xs:annotation>
+			<xs:documentation>Linie</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="segment" type="segmentType" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="circle">
+		<xs:annotation>
+			<xs:documentation>Kruh</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="polygonType">
+				<xs:sequence>
+					<xs:element name="c" type="coordinateType"/>
+				</xs:sequence>
+				<xs:attribute name="r" type="radiusAttrType" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="solidType">
+		<xs:annotation>
+			<xs:documentation>Vyplněný polygon</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="polygon" type="polygonType"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="holeCollectionType">
+		<xs:annotation>
+			<xs:documentation>Díra</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="polygon" type="polygonType" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="regionType">
+		<xs:annotation>
+			<xs:documentation>Region. Skládá se z jednoho obvodového polygonu a může obsahoat díry</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="solid" type="solidType" maxOccurs="1"/>
+			<xs:element name="holes" type="holeCollectionType" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="segmentType" abstract="true">
+		<xs:annotation>
+			<xs:documentation>Bázový typ segmentu</xs:documentation>
+		</xs:annotation>
+	</xs:complexType>
+	<xs:complexType name="se">
+		<xs:annotation>
+			<xs:documentation>Liniový segment</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="segmentType">
+				<xs:sequence>
+					<xs:element name="c" type="coordinateType" minOccurs="2" maxOccurs="unbounded"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ar">
+		<xs:annotation>
+			<xs:documentation>Oblouk</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="segmentType">
+				<xs:sequence>
+					<xs:element name="c" type="coordinateType" minOccurs="3" maxOccurs="3"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:simpleType name="radiusAttrType">
+		<xs:annotation>
+			<xs:documentation>Průměr</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:decimal"/>
+	</xs:simpleType>
+	<xs:simpleType name="rotationAttrType">
+		<xs:annotation>
+			<xs:documentation>Úhel v radiánech</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:decimal"/>
+	</xs:simpleType>
+	<xs:simpleType name="justificationAttrType">
+		<xs:annotation>
+			<xs:documentation>Zarovnání textu</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:integer">
+			<xs:enumeration value="11">
+				<xs:annotation>
+					<xs:documentation>spodní levý okraj text boxu</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="12">
+				<xs:annotation>
+					<xs:documentation>spodní levý okraj text boxu</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="13">
+				<xs:annotation>
+					<xs:documentation>spodní okraj text boxu, střed</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="14">
+				<xs:annotation>
+					<xs:documentation>spodní pravý okraj text boxu</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="15">
+				<xs:annotation>
+					<xs:documentation>spodní pravý okraj text boxu</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="21">
+				<xs:annotation>
+					<xs:documentation>spodní levý okraj textu</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="22">
+				<xs:annotation>
+					<xs:documentation>spodní levý okraj textu</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="23">
+				<xs:annotation>
+					<xs:documentation>spodní střed textu</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="24">
+				<xs:annotation>
+					<xs:documentation>spodní pravý okraj textu</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="25">
+				<xs:annotation>
+					<xs:documentation>spodní pravý okraj textu</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="31">
+				<xs:annotation>
+					<xs:documentation>levý střední okraj textu</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="32">
+				<xs:annotation>
+					<xs:documentation>levý střední okraj textu</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="33">
+				<xs:annotation>
+					<xs:documentation>střed textu</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="34">
+				<xs:annotation>
+					<xs:documentation>pravý střední okraj textu</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="35">
+				<xs:annotation>
+					<xs:documentation>pravý střední okraj textu</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="41">
+				<xs:annotation>
+					<xs:documentation>levý horní okraj textu</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="42">
+				<xs:annotation>
+					<xs:documentation>levý horní okraj textu</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="51">
+				<xs:annotation>
+					<xs:documentation>levý horní okraj textu</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="52">
+				<xs:annotation>
+					<xs:documentation>levý horní okraj textu</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="53">
+				<xs:annotation>
+					<xs:documentation>horní střed</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="43">
+				<xs:annotation>
+					<xs:documentation>horní střed</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>			
+			<xs:enumeration value="44">
+				<xs:annotation>
+					<xs:documentation>horní pravý okraj textu</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="45">
+				<xs:annotation>
+					<xs:documentation>horní pravý okraj textu</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="54">
+				<xs:annotation>
+					<xs:documentation>horní pravý okraj textu</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="55">
+				<xs:annotation>
+					<xs:documentation>horní pravý okraj textu</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="heightAttrType">
+		<xs:annotation>
+			<xs:documentation>Výška</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:decimal"/>
+	</xs:simpleType>
+	<xs:simpleType name="widthAttrType">
+		<xs:annotation>
+			<xs:documentation>Šířka</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:decimal"/>
+	</xs:simpleType>
+	<xs:simpleType name="valueAttrType">
+		<xs:annotation>
+			<xs:documentation>Základní číselná hodnota</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:decimal"/>
+	</xs:simpleType>
+	<xs:complexType name="textType">
+		<xs:annotation>
+			<xs:documentation>Text v grafice</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="c" type="coordinateType">
+				<xs:annotation>
+					<xs:documentation>Souřadnice</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="hod" type="notEmptyStringType" use="required">
+			<xs:annotation>
+				<xs:documentation>Text</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="o" type="rotationAttrType" use="optional">
+			<xs:annotation>
+				<xs:documentation>Natočení textu</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="j" type="justificationAttrType" use="optional">
+			<xs:annotation>
+				<xs:documentation>Zarovnání</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="vys" type="heightAttrType" use="optional">
+			<xs:annotation>
+				<xs:documentation>Výška</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="sir" type="widthAttrType" use="optional">
+			<xs:annotation>
+				<xs:documentation>Šířka</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="cellType">
+		<xs:annotation>
+			<xs:documentation>Značka (buňka)</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="c" type="coordinateType">
+				<xs:annotation>
+					<xs:documentation>Souřadnice</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="o" type="rotationAttrType" use="optional">
+			<xs:annotation>
+				<xs:documentation>Natočení</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="naz" type="notEmptyStringType" use="optional">
+			<xs:annotation>
+				<xs:documentation>Název</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:simpleType name="cadasterCodeType">
+		<xs:annotation>
+			<xs:documentation>Kód katastrálního území</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:integer">
+			<xs:minInclusive value="600000"/>
+			<xs:maxInclusive value="999999"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="lvNumberAttrType">
+		<xs:annotation>
+			<xs:documentation>Číslo listu vlastnictví</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:integer">
+			<xs:minInclusive value="-99999"/>
+			<xs:maxInclusive value="99999"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="numeratorType">
+		<xs:annotation>
+			<xs:documentation>Čitatel vlastnického podílu podílu</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:integer">
+			<xs:minInclusive value="1"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="denominatorType">
+		<xs:annotation>
+			<xs:documentation>Jmenovatel vlastnického podílu</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:integer">
+			<xs:minInclusive value="1"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="areaAttrType">
+		<xs:annotation>
+			<xs:documentation>Plocha v (m2)</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:decimal">
+			<xs:minInclusive value="0"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="priceAttrType">
+		<xs:annotation>
+			<xs:documentation>Cena</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:decimal">
+			<xs:minInclusive value="0"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="distanceType">
+		<xs:annotation>
+			<xs:documentation>Vzdálenost</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:decimal">
+			<xs:minInclusive value="0"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="notEmptyStringType">
+		<xs:annotation>
+			<xs:documentation>Neprázdný textový řetězec</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="opsubIdType">
+		<xs:annotation>
+			<xs:documentation>ID oprávněného subjektu</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="bpejType">
+		<xs:annotation>
+			<xs:documentation>Typ oceňovacího dílu</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:integer">
+			<xs:enumeration value="1">
+				<xs:annotation>
+					<xs:documentation>areál BPEJ</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="2">
+				<xs:annotation>
+					<xs:documentation>areál SLT</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="3">
+				<xs:annotation>
+					<xs:documentation>uživatelský kód</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="bpejCodeAttrType">
+		<xs:annotation>
+			<xs:documentation>Kód BPEJ</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="5"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="birthNumberType">
+		<xs:annotation>
+			<xs:documentation>Rodné číslo</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:minLength value="6"/>
+			<xs:maxLength value="10"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="streetNumberType">
+		<xs:annotation>
+			<xs:documentation>Číslo domovní</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:integer">
+			<xs:minInclusive value="0"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="orientationNumberType">
+		<xs:annotation>
+			<xs:documentation>Číslo orientační</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="4"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="postCodeType">
+		<xs:annotation>
+			<xs:documentation>PSČ</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:length value="5"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="emailType">
+		<xs:annotation>
+			<xs:documentation>E-mail</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value=".*@.*"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="icoType">
+		<xs:annotation>
+			<xs:documentation>IČO</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:integer">
+			<xs:minInclusive value="0"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="koeficientType">
+		<xs:annotation>
+			<xs:documentation>Obecný koeficient</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:decimal">
+			<xs:minInclusive value="0"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="participantType">
+		<xs:annotation>
+			<xs:documentation>Typ účastníka</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:decimal">
+			<xs:enumeration value="1">
+				<xs:annotation>
+					<xs:documentation>Vlastník</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="2">
+				<xs:annotation>
+					<xs:documentation>Okruh dědiců</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="3">
+				<xs:annotation>
+					<xs:documentation>Opatrovník</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="4">
+				<xs:annotation>
+					<xs:documentation>Zástupce vlastníka - plná moc</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="5">
+				<xs:annotation>
+					<xs:documentation>Zástupce - právnické osoby</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="6">
+				<xs:annotation>
+					<xs:documentation>Účastník z jiného právního vztahu</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="7">
+				<xs:annotation>
+					<xs:documentation>Ostatní</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="basicIdAttrType">
+		<xs:annotation>
+			<xs:documentation>Obecné číselné ID</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:integer"/>
+	</xs:simpleType>
+	<xs:simpleType name="kindOfUseAttrType">
+		<xs:annotation>
+			<xs:documentation>Způsob využití dle číselníku ISKN</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:decimal"/>
+	</xs:simpleType>
+	<xs:simpleType name="kindOfAreaAttrType">
+		<xs:annotation>
+			<xs:documentation>Druh pozemku dle číselníku ISKN</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:decimal"/>
+	</xs:simpleType>
+	<xs:simpleType name="basicStringIdAttrType">
+		<xs:annotation>
+			<xs:documentation>Základní id jako text</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="notEmptyStringType"/>
+	</xs:simpleType>
+	<xs:simpleType name="participantIdAttrType">
+		<xs:annotation>
+			<xs:documentation>ID účastníka</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:integer"/>
+	</xs:simpleType>
+	<xs:simpleType name="parcelIdAttrType">
+		<xs:annotation>
+			<xs:documentation>ID parcely</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="basicStringIdAttrType"/>
+	</xs:simpleType>
+	<xs:simpleType name="noteAttrType">
+		<xs:annotation>
+			<xs:documentation>Poznámka</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:minLength value="0"/>
+			<xs:maxLength value="255"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="outsideParcelType">
+		<xs:annotation>
+			<xs:documentation>Parcely mimo obvod</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="pa" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="gpar" type="gparType">
+							<xs:annotation>
+								<xs:documentation>Grafika</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+					<xs:attribute name="parid" type="parcelIdAttrType" use="required">
+						<xs:annotation>
+							<xs:documentation>ID parcely</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="newNumberType">
+		<xs:annotation>
+			<xs:documentation>Parcela s novým číslem</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="vym" type="areaAttrType" use="required"/>
+		<xs:attribute name="kk" type="cadasterCodeType" use="required"/>
+		<xs:attribute name="kcp" type="parcelNumberAttrType" use="required"/>
+		<xs:attribute name="pcp" type="poddeleniNumberAttrType" use="optional"/>
+		<xs:attribute name="dcp" type="druhCislovaniNumberAttrType" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="newNumberCollectionType">
+		<xs:annotation>
+			<xs:documentation>Seznam parcel s novým číslem</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="nc" type="newNumberType" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="pneresType">
+		<xs:annotation>
+			<xs:documentation>Neřešené parcely</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="pa" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="gpar" type="gparType"/>
+						<xs:element name="ncn" type="newNumberCollectionType" minOccurs="0"/>
+					</xs:sequence>
+					<xs:attribute name="parid" type="parcelIdAttrType" use="required"/>
+					<xs:attribute name="vymz" type="areaAttrType" use="required"/>
+					<xs:attribute name="dpz" type="kindOfAreaAttrType" use="required"/>
+					<xs:attribute name="zvz" type="kindOfUseAttrType" use="optional"/>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ochrType">
+		<xs:annotation>
+			<xs:documentation>Způsob ochrany</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="dil" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:attribute name="zo" type="xs:integer" use="required"/>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="typPravAttrType">
+		<xs:annotation>
+			<xs:documentation>Kód typy právního vztahu dle číselníku ISKN</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:integer"/>
+	</xs:simpleType>
+	<xs:complexType name="bremenoType">
+		<xs:annotation>
+			<xs:documentation>Břemeno</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="cen" type="priceAttrType" use="optional"/>
+		<xs:attribute name="typ" type="typPravAttrType" use="required"/>
+		<xs:attribute name="popis" type="notEmptyStringType" use="optional"/>
+		<xs:attribute name="o_pro_id" type="notEmptyStringType" use="optional"/>
+		<xs:attribute name="p_k_id" type="notEmptyStringType" use="required"/>
+		<xs:attribute name="o_k_id" type="notEmptyStringType" use="optional"/>
+		<xs:attribute name="pn_id" type="parcelIdAttrType" use="optional"/>
+		<xs:attribute name="p_pro_id" type="parcelIdAttrType" use="optional"/>
+	</xs:complexType>
+	<xs:complexType name="bremCollectionType">
+		<xs:annotation>
+			<xs:documentation>Seznam břemen</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="bre" type="bremenoType" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="nvlaType">
+		<xs:annotation>
+			<xs:documentation>Původní vlastnický celek</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="lvn" type="lvNumberAttrType" use="required"/>
+		<xs:attribute name="kkn" type="cadasterCodeType" use="required"/>
+		<xs:attribute name="vymp" type="areaAttrType" use="required"/>
+		<xs:attribute name="cenp" type="priceAttrType" use="required"/>
+		<xs:attribute name="vzdp" type="distanceType" use="required"/>
+		<xs:attribute name="op_id" type="opsubIdType" use="optional"/>
+		<xs:attribute name="poz" type="noteAttrType" use="optional"/>
+	</xs:complexType>
+	<xs:complexType name="nvlaCollectionType">
+		<xs:annotation>
+			<xs:documentation>Seznam původních vlastnických celků</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="nvla" type="nvlaType" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="vlaCollectionType">
+		<xs:annotation>
+			<xs:documentation>Seznam vlastnických celků</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="vla" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="nvlas" type="nvlaCollectionType" minOccurs="0"/>
+					</xs:sequence>
+					<xs:attribute name="op_id" type="opsubIdType" use="required"/>
+					<xs:attribute name="cit" type="numeratorType" use="required"/>
+					<xs:attribute name="jmen" type="denominatorType" use="required"/>
+					<xs:attribute name="tpk" type="xs:integer" use="required"/>
+					<xs:attribute name="rus" type="rusAttrType" use="optional"/>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="participantReferenceType">
+		<xs:annotation>
+			<xs:documentation>Reference na účastníka</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="uc_id" type="participantIdAttrType" use="required">
+			<xs:annotation>
+				<xs:documentation>Odkaz na účastníka - id v objektu ucastnici</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="op_id" type="opsubIdType" use="required">
+			<xs:annotation>
+				<xs:documentation>Odkaz na zastupovaného vlastníka (jiného oprávněného či povinného) - opsub_id dle ISKN</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="typ" type="participantType" use="required">
+			<xs:annotation>
+				<xs:documentation>Typ účastníka</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:simpleType name="druhCislovaniNumberAttrType">
+		<xs:annotation>
+			<xs:documentation>Druh číslování parcely (stavební, pozemková)</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:integer">
+			<xs:enumeration value="1">
+				<xs:annotation>
+					<xs:documentation>stavební parcela</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="2">
+				<xs:annotation>
+					<xs:documentation>pozemková parcela</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="parcelNumberAttrType">
+		<xs:annotation>
+			<xs:documentation>Kmenové číslo parcely</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:integer">
+			<xs:minInclusive value="1"/>
+			<xs:maxInclusive value="99999"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="poddeleniNumberAttrType">
+		<xs:annotation>
+			<xs:documentation>Poddelení čísla parcely</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:integer">
+			<xs:minInclusive value="1"/>
+			<xs:maxInclusive value="999"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="resAttrType">
+		<xs:annotation>
+			<xs:documentation>Směnitelnost plochy</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:integer">
+			<xs:enumeration value="0">
+				<xs:annotation>
+					<xs:documentation>Neřešená</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="1">
+				<xs:annotation>
+					<xs:documentation>Řešená</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>	
+	<xs:simpleType name="rusAttrType">
+		<xs:annotation>
+			<xs:documentation>Zrušené podíly</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:integer">
+			<xs:enumeration value="0">
+				<xs:annotation>
+					<xs:documentation>Přerozdělený podíl</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="1">
+				<xs:annotation>
+					<xs:documentation>Zaniklý podíl</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="cirAttrType">
+		<xs:annotation>
+			<xs:documentation>Církevní půda</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:integer">
+			<xs:enumeration value="0">
+				<xs:annotation>
+					<xs:documentation>Mimo církev</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="1">
+				<xs:annotation>
+					<xs:documentation>Určené pro církev</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="soucAttrType">
+		<xs:annotation>
+			<xs:documentation>Stavba součástí pozemku</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:integer">
+			<xs:enumeration value="0">
+				<xs:annotation>
+					<xs:documentation>Stavba je samostatnou nemovitou věcí</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="1">
+				<xs:annotation>
+					<xs:documentation>Stavba je součástí navrženého pozemku</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>	
+	</xs:simpleType>
+	<xs:simpleType name="vysAttrType">
+		<xs:annotation>
+			<xs:documentation>Vyšetřený bod</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:integer">
+			<xs:enumeration value="0">
+				<xs:annotation>
+					<xs:documentation>Bod nebyl vyšetřen</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="1">
+				<xs:annotation>
+					<xs:documentation>Bod byl vyšetřen</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="2">
+				<xs:annotation>
+					<xs:documentation>Bod obvodu byl vyšetřen v rámci vnitřního obvodu</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="3">
+				<xs:annotation>
+					<xs:documentation>Bod obvodu byl vyšetřen v rámci hranic neřešených parcel</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>			
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="navrhPhaseType">
+		<xs:annotation>
+			<xs:documentation>fáze návrhu</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:integer">
+			<xs:enumeration value="1">
+				<xs:annotation>
+					<xs:documentation>pracovní verze</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="2">
+				<xs:annotation>
+					<xs:documentation>verze pro vystavení návrhu</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="3">
+				<xs:annotation>
+					<xs:documentation>verze pro 1. rozhodnutí</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="4">
+				<xs:annotation>
+					<xs:documentation>verze pro 2. rozhodnutí</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="navrhType">
+		<xs:annotation>
+			<xs:documentation>Návrh</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="lv" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>List vlastnictví</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="par">
+							<xs:annotation>
+								<xs:documentation>Seznam parcel</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="pa" maxOccurs="unbounded">
+										<xs:annotation>
+											<xs:documentation>Parcela</xs:documentation>
+										</xs:annotation>
+										<xs:complexType>
+											<xs:sequence>
+												<xs:element name="area" type="areaType"/>
+												<xs:element name="bpej" type="bpejCollectionType" minOccurs="0"/>
+												<xs:element name="brem" type="bremCollectionType" minOccurs="0"/>
+												<xs:element name="ochr" type="ochrType" minOccurs="0"/>
+												<xs:element name="por" type="porCollectionType" minOccurs="0"/>
+											</xs:sequence>
+											<xs:attribute name="id" type="parcelIdAttrType" use="required"/>
+											<xs:attribute name="kcpp" type="parcelNumberAttrType" use="optional">
+												<xs:annotation>
+													<xs:documentation>Pracovní kmenové číslo parcely, pokud již má v kcp definitivní číslo</xs:documentation>
+												</xs:annotation>
+											</xs:attribute>
+											<xs:attribute name="pcpp" type="poddeleniNumberAttrType" use="optional">
+												<xs:annotation>
+													<xs:documentation>Pracovní podlomení čísla parcely, pokud již má v kcp definitivní číslo</xs:documentation>
+												</xs:annotation>
+											</xs:attribute>
+											<xs:attribute name="dcpp" type="druhCislovaniNumberAttrType" use="optional">
+												<xs:annotation>
+													<xs:documentation>Pracovní druh číslování parcely, pokud již má v kcp definitivní číslo</xs:documentation>
+												</xs:annotation>
+											</xs:attribute>
+											<xs:attribute name="kcp" type="parcelNumberAttrType" use="required">
+												<xs:annotation>
+													<xs:documentation>Kmenové číslo parcely (je-li vyplněno kcpp, jedná se o definitivní číslo, není-li vyplněno kcpp, jedná se o pracovní číslo)</xs:documentation>
+												</xs:annotation>
+											</xs:attribute>
+											<xs:attribute name="pcp" type="poddeleniNumberAttrType" use="optional">
+												<xs:annotation>
+													<xs:documentation>Podlomení čísla parcely (definitivní nebo pracovní, viz kcp)</xs:documentation>
+												</xs:annotation>
+											</xs:attribute>
+											<xs:attribute name="dcp" type="druhCislovaniNumberAttrType" use="required">
+												<xs:annotation>
+													<xs:documentation>Druh číslování parcely (definitivní nebo pracovní, viz kcp)</xs:documentation>
+												</xs:annotation>
+											</xs:attribute>
+											<xs:attribute name="kk" type="cadasterCodeType" use="required"/>
+											<xs:attribute name="vym" type="areaAttrType" use="required">
+												<xs:annotation>
+													<xs:documentation>Výměra</xs:documentation>
+												</xs:annotation>
+											</xs:attribute>
+											<xs:attribute name="vzd" type="distanceType" use="optional">
+												<xs:annotation>
+													<xs:documentation>Vzdálenost</xs:documentation>
+												</xs:annotation>
+											</xs:attribute>
+											<xs:attribute name="dp" type="kindOfAreaAttrType" use="required">
+												<xs:annotation>
+													<xs:documentation>Druh pozemku</xs:documentation>
+												</xs:annotation>
+											</xs:attribute>
+											<xs:attribute name="zv" type="kindOfUseAttrType" use="optional">
+												<xs:annotation>
+													<xs:documentation>Způsob využití</xs:documentation>
+												</xs:annotation>
+											</xs:attribute>
+											<xs:attribute name="res" type="resAttrType" use="required">
+												<xs:annotation>
+													<xs:documentation>Rozlišení navržené a neřešené parcely</xs:documentation>
+												</xs:annotation>
+											</xs:attribute>
+											<xs:attribute name="poz" type="noteAttrType" use="optional">
+												<xs:annotation>
+													<xs:documentation>Poznámka</xs:documentation>
+												</xs:annotation>
+											</xs:attribute>
+											<xs:attribute name="bu_id" type="basicStringIdAttrType" use="optional">
+												<xs:annotation>
+													<xs:documentation>ISKN.ID budovy na parcele</xs:documentation>
+												</xs:annotation>
+											</xs:attribute>
+											<xs:attribute name="cir" type="cirAttrType" use="required">
+												<xs:annotation>
+													<xs:documentation>Církevní majetek</xs:documentation>
+												</xs:annotation>
+											</xs:attribute>
+											<xs:attribute name="ps_id" type="basicStringIdAttrType" use="optional">
+												<xs:annotation>
+													<xs:documentation>ISKN.ID práva stavby na parcele</xs:documentation>
+												</xs:annotation>
+											</xs:attribute>
+											<xs:attribute name="souc" type="soucAttrType" use="optional">
+												<xs:annotation>
+													<xs:documentation>Stavba součástí pozemku</xs:documentation>
+												</xs:annotation>
+											</xs:attribute>
+										</xs:complexType>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="ucas" type="ucaCollectionType" minOccurs="0" maxOccurs="1">
+							<xs:annotation>
+								<xs:documentation>Seznam účastníků</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+					<xs:attribute name="kk" type="cadasterCodeType" use="required"/>
+					<xs:attribute name="cis" type="lvNumberAttrType" use="required"/>
+					<xs:attribute name="vymr" type="areaAttrType" use="required"/>
+					<xs:attribute name="vymnr" type="areaAttrType" use="required"/>
+					<xs:attribute name="cen" type="priceAttrType" use="required"/>
+					<xs:attribute name="vzd" type="distanceType" use="required"/>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="fn" type="navrhPhaseType" use="required">
+			<xs:annotation>
+				<xs:documentation>fáze návrhu</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="dvn" type="xs:dateTime" use="optional">
+			<xs:annotation>
+				<xs:documentation>datum vystavení návrhu</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="dvnr" type="xs:dateTime" use="optional">
+			<xs:annotation>
+				<xs:documentation>datum vyložení nároku</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>		
+	</xs:complexType>
+	<xs:complexType name="bpejCollectionType">
+		<xs:annotation>
+			<xs:documentation>Seznam BPEJ</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="dil" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:attribute name="typ" type="bpejType" use="required"/>
+					<xs:attribute name="kod" type="bpejCodeAttrType" use="required"/>
+					<xs:attribute name="vym" type="areaAttrType" use="required"/>
+					<xs:attribute name="cen" type="priceAttrType" use="optional"/>
+					<xs:attribute name="poz" type="xs:string" use="optional"/>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="claimBpejCollectionType">
+		<xs:annotation>
+			<xs:documentation>Seznam BPEJ</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="dil" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:attribute name="typ" type="bpejType" use="required"/>
+					<xs:attribute name="kod" type="bpejCodeAttrType" use="required"/>
+					<xs:attribute name="vym" type="areaAttrType" use="required"/>
+					<xs:attribute name="cen" type="priceAttrType" use="optional"/>
+					<xs:attribute name="poz" type="xs:string" use="optional"/>
+					<xs:attribute name="dp" type="kindOfAreaAttrType" use="optional"/>
+					<xs:attribute name="zv" type="kindOfUseAttrType" use="optional"/>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="areaKindLabelAttrType">
+		<xs:annotation>
+			<xs:documentation>Označení druhu porostu</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="notEmptyStringType"/>
+	</xs:simpleType>
+	<xs:complexType name="porostPartTypeBase" abstract="true">
+		<xs:annotation>
+			<xs:documentation>Porosty</xs:documentation>
+		</xs:annotation>
+	</xs:complexType>
+	<xs:complexType name="solPart">
+		<xs:annotation>
+			<xs:documentation>Solitér</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="porostPartTypeBase">
+				<xs:attribute name="cen" type="priceAttrType" use="required"/>
+				<xs:attribute name="naz" type="notEmptyStringType" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="znaPart">
+		<xs:annotation>
+			<xs:documentation>Cena porostu na parcele určená znalecem</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="porostPartTypeBase">
+				<xs:attribute name="cen" type="areaAttrType" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="porPart">
+		<xs:annotation>
+			<xs:documentation>Porost</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="porostPartTypeBase">
+				<xs:attribute name="dp" type="kindOfAreaAttrType" use="required">
+					<xs:annotation>
+						<xs:documentation>Druh pozemku (jen pro přiřazení v soupisu nároků)</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="dpo" type="areaKindLabelAttrType" use="required">
+					<xs:annotation>
+						<xs:documentation>Druh porostu</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="zv" type="kindOfUseAttrType" use="optional">
+					<xs:annotation>
+						<xs:documentation>Zprůsob využití pozemku</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="cen" type="priceAttrType" use="required">
+					<xs:annotation>
+						<xs:documentation>Cena za m2 (jedinečná pro daný druh porostu)</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="vym" type="areaAttrType" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="porCollectionType">
+		<xs:annotation>
+			<xs:documentation>Kolekce porostů</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="dil" type="porostPartTypeBase" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="areaType">
+		<xs:annotation>
+			<xs:documentation>Pár plocha + text</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="reg" type="regionType"/>
+			<xs:element name="t" type="textType"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ucaCollectionType">
+		<xs:annotation>
+			<xs:documentation>Seznam účastníků</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="uca" type="participantReferenceType" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="gparType">
+		<xs:annotation>
+			<xs:documentation>Seznam area</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="area" type="areaType" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="narokType">
+		<xs:annotation>
+			<xs:documentation>Nárok</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="lv" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>List vlastnictví</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="par" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Seznam parcel</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="pa" maxOccurs="unbounded">
+										<xs:annotation>
+											<xs:documentation>Parcela</xs:documentation>
+										</xs:annotation>
+										<xs:complexType>
+											<xs:sequence>
+												<xs:element name="gpar" type="gparType">
+													<xs:annotation>
+														<xs:documentation>Graficka parcely jako kolekce plocha-text</xs:documentation>
+													</xs:annotation>
+												</xs:element>
+												<xs:element name="bpej" type="claimBpejCollectionType" minOccurs="0"/>
+												<xs:element name="por" type="porCollectionType" minOccurs="0"/>
+											</xs:sequence>
+											<xs:attribute name="parid" type="parcelIdAttrType" use="required"/>
+											<xs:attribute name="vymo" type="areaAttrType" use="optional"/>
+											<xs:attribute name="vzd" type="distanceType" use="optional"/>
+											<xs:attribute name="vymg" type="areaAttrType" use="optional"/>
+											<xs:attribute name="poz" type="noteAttrType" use="optional"/>
+											<xs:attribute name="cir" type="cirAttrType" use="required"/>
+										</xs:complexType>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="vlas" type="vlaCollectionType" minOccurs="0" maxOccurs="1">
+							<xs:annotation>
+								<xs:documentation>Vlastnické celky</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="ucas" type="ucaCollectionType" minOccurs="0" maxOccurs="1">
+							<xs:annotation>
+								<xs:documentation>Seznam účastníků</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+					<xs:attribute name="cis" type="lvNumberAttrType" use="required"/>
+					<xs:attribute name="kk" type="cadasterCodeType" use="required"/>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ucaType">
+		<xs:annotation>
+			<xs:documentation>Účastník</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="id" type="participantIdAttrType" use="optional"/>
+		<xs:attribute name="op_id" type="opsubIdType" use="optional"/>
+		<xs:attribute name="jm" type="xs:string" use="optional"/>
+		<xs:attribute name="pr" type="xs:string" use="optional"/>
+		<xs:attribute name="naz" type="xs:string" use="optional"/>
+		<xs:attribute name="tpj" type="xs:string" use="optional"/>
+		<xs:attribute name="tzj" type="xs:string" use="optional"/>
+		<xs:attribute name="rc" type="birthNumberType" use="optional"/>
+		<xs:attribute name="ico" type="icoType" use="optional"/>
+		<xs:attribute name="ul" type="xs:string" use="optional"/>
+		<xs:attribute name="cd" type="streetNumberType" use="optional"/>
+		<xs:attribute name="co" type="orientationNumberType" use="optional"/>
+		<xs:attribute name="caob" type="xs:string" use="optional"/>
+		<xs:attribute name="mc" type="xs:string" use="optional"/>
+		<xs:attribute name="ob" type="xs:string" use="optional"/>
+		<xs:attribute name="psc" type="postCodeType" use="optional"/>
+		<xs:attribute name="okr" type="xs:string" use="optional"/>
+		<xs:attribute name="sta" type="xs:string" use="optional"/>
+		<xs:attribute name="email" type="emailType" use="optional"/>
+		<xs:attribute name="tel" type="notEmptyStringType" use="optional"/>
+	</xs:complexType>
+	<xs:complexType name="ucastniciType">
+		<xs:annotation>
+			<xs:documentation>Kolekce účastníků</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="uca" type="ucaType" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="graphicElementCodeType">
+		<xs:annotation>
+			<xs:documentation>Kód typu grafického zobrazení prvku</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:integer">
+			<xs:minInclusive value="1"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="mdpType">
+		<xs:annotation>
+			<xs:documentation>Mapa druhu pozemku</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="pl" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="area" type="areaType"/>
+					</xs:sequence>
+					<xs:attribute name="id" type="basicIdAttrType" use="required"/>
+					<xs:attribute name="dp" type="kindOfAreaAttrType" use="required">
+						<xs:annotation>
+							<xs:documentation>Druh pozemku</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="zv" type="kindOfUseAttrType" use="optional">
+						<xs:annotation>
+							<xs:documentation>Způsob využití</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+		<xs:complexType name="plin">
+		<xs:sequence>
+			<xs:element name="lin" type="linearType" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="typ" type="graphicElementCodeType" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="pzna">
+		<xs:sequence>
+			<xs:element name="b" type="cellType" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="typ" type="graphicElementCodeType" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="ptext">
+		<xs:sequence>
+			<xs:element name="t" type="textType" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="typ" type="graphicElementCodeType" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="parea">
+		<xs:sequence>
+			<xs:element name="reg" type="regionType" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="typ" type="graphicElementCodeType" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="psouType">
+		<xs:attribute name="sx" type="coordinateAttrType" use="required"/>
+		<xs:attribute name="sy" type="coordinateAttrType" use="required"/>
+		<xs:attribute name="sz" type="coordinateAttrType" use="optional"/>
+		<xs:attribute name="cb" type="xs:integer" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="zsType">
+		<xs:annotation>
+			<xs:documentation>Zaměření skutečného stavu</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="plins" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="plin" type="plin" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="pznas" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="pzna" type="pzna" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="ptexts" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="ptext" type="ptext" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="psour" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="psou" type="psouType" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="pmType">
+		<xs:annotation>
+			<xs:documentation>Přehledná mapa</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="pmlins" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="pmlin" type="plin" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="pmznas" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="pmzna" type="pzna" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="pmtexts" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="pmtext" type="ptext" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="pmareas" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="pmarea" type="parea" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="mpType">
+		<xs:annotation>
+			<xs:documentation>Mapa průzkumu</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="mplins" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="mplin" type="plin" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="mpznas" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="mpzna" type="pzna" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="mptexts" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="mptext" type="ptext" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="mpareas" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="mparea" type="parea" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="meosType">
+		<xs:annotation>
+			<xs:documentation>Mapa erozního ohrožení souč. stav</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="meoslins" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="meoslin" type="plin" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="meosznas" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="meoszna" type="pzna" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="meostexts" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="meostext" type="ptext" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="meosareas" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="meosarea" type="parea" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="meonType">
+		<xs:annotation>
+			<xs:documentation>Mapa erozního ohrožení navržený stav</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="meonlins" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="meonlin" type="plin" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="meonznas" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="meonzna" type="pzna" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="meontexts" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="meontext" type="ptext" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="meonareas" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="meonarea" type="parea" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="hvpszType">
+		<xs:annotation>
+			<xs:documentation>Hlavní výkres PSZ</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="hvpszlins" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="hvpszlin" type="plin" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="hvpszznas" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="hvpszzna" type="pzna" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="hvpsztexts" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="hvpsztext" type="ptext" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="hvpszareas" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="hvpszarea" type="parea" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="zvbodsType">
+		<xs:annotation>
+			<xs:documentation>Body výškopisu</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="zvbod" minOccurs="1" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="c" type="coordinateType" minOccurs="1" maxOccurs="1"/>
+					</xs:sequence>
+					<xs:attribute name="cb" type="xs:integer" use="required">
+						<xs:annotation>
+							<xs:documentation>Číslo bodu</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="zvlinsType">
+		<xs:sequence>
+			<xs:element name="zvlin" minOccurs="1" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="lin" type="linearType" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="zvareasType">
+		<xs:sequence>
+			<xs:element name="zvarea" minOccurs="1" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="reg" type="regionType" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="souType">
+		<xs:attribute name="sx" type="coordinateAttrType" use="required"/>
+		<xs:attribute name="sy" type="coordinateAttrType" use="required"/>
+		<xs:attribute name="cb" type="xs:integer" use="required"/>
+		<xs:attribute name="kk" type="xs:integer" use="required"/>
+		<xs:attribute name="ps" type="notEmptyStringType" use="optional"/>
+		<xs:attribute name="vys" type="vysAttrType" use="optional"/>
+	</xs:complexType>
+	<xs:complexType name="opuType">
+		<xs:annotation>
+			<xs:documentation>Obvod pozemkové úpravy</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="pl" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="reg" type="regionType"/>
+						<xs:element name="sour" minOccurs="0">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="sou" type="souType" maxOccurs="unbounded"/>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+					<xs:attribute name="id" type="basicIdAttrType" use="required"/>
+					<xs:attribute name="res" type="resAttrType" use="required">
+						<xs:annotation>
+							<xs:documentation>Příznak směnitelnosti plochy (1=řešená, 0=neřešená)</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="poz" type="noteAttrType" use="optional"/>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="porostType" abstract="true">
+		<xs:annotation>
+			<xs:documentation>Bázový typ porostu (plocha, solitér)</xs:documentation>
+		</xs:annotation>
+	</xs:complexType>
+	<xs:complexType name="sol">
+		<xs:annotation>
+			<xs:documentation>Solitér</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="porostType">
+				<xs:sequence>
+					<xs:element name="b" type="cellType"/>
+				</xs:sequence>
+				<xs:attribute name="cen" type="priceAttrType" use="required"/>
+				<xs:attribute name="naz" type="xs:string" use="required"/>
+				<xs:attribute name="id" type="basicIdAttrType" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="por">
+		<xs:annotation>
+			<xs:documentation>Plocha porostu</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="porostType">
+				<xs:sequence>
+					<xs:element name="area" type="areaType"/>
+				</xs:sequence>
+				<xs:attribute name="dp" type="kindOfAreaAttrType" use="required">
+					<xs:annotation>
+						<xs:documentation>Druh pozemku (jen pro přiřazení v soupisu nároků)</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="dpo" type="areaKindLabelAttrType" use="optional">
+					<xs:annotation>
+						<xs:documentation>Označení druhu porostu</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="zv" type="kindOfUseAttrType" use="optional">
+					<xs:annotation>
+						<xs:documentation>Způsob využití pozemku</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="cen" type="priceAttrType" use="optional">
+					<xs:annotation>
+						<xs:documentation>Cena za m2 (jedinečná pro daný druh porostu)</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="id" type="basicIdAttrType" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:simpleType name="stageType">
+		<xs:annotation>
+			<xs:documentation>Fáze projektu</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:decimal">
+			<xs:enumeration value="0">
+				<xs:annotation>
+					<xs:documentation>Předběžný seznam účastníků</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="1">
+				<xs:annotation>
+					<xs:documentation>Zaměření polohopisu</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="2">
+				<xs:annotation>
+					<xs:documentation>Určení obvodů PÚ</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="3">
+				<xs:annotation>
+					<xs:documentation>Zjišťování hranic pozemků neřešených</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="4">
+				<xs:annotation>
+					<xs:documentation>Rozbor současného stavu</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="5">
+				<xs:annotation>
+					<xs:documentation>Plán společných zařízení</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="6">
+				<xs:annotation>
+					<xs:documentation>Zaměření výškopisu</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="7">
+				<xs:annotation>
+					<xs:documentation>Dokumentace nároků vlastníků</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="8">
+				<xs:annotation>
+					<xs:documentation>Návrh nového uspořádání pozemků</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="9">
+				<xs:annotation>
+					<xs:documentation>Export dat zhotoviteli</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="landConsType">
+		<xs:annotation>
+			<xs:documentation>Typ pozemkové úpravy</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="kopu"/>
+			<xs:enumeration value="jpu"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ocvType">
+		<xs:annotation>
+			<xs:documentation>Účinnost oceňovací vyhlášky (měsíc/rok)</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="([1-9]|1[012])/[1|2][0-9]{3}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="versionType">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="\d+\.\d+"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="headerType">
+		<xs:annotation>
+			<xs:documentation>Hlavička</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="dvz" type="xs:dateTime" use="required"/>
+		<xs:attribute name="dkn" type="xs:dateTime" use="required"/>
+		<xs:attribute name="aut" type="notEmptyStringType" use="required"/>
+		<xs:attribute name="et" type="stageType" use="required"/>
+		<xs:attribute name="kk" type="cadasterCodeType" use="required"/>
+		<xs:attribute name="typ" type="landConsType" use="required"/>
+		<xs:attribute name="cpu" type="xs:positiveInteger" use="required"/>
+		<xs:attribute name="ocv" type="ocvType" use="optional"/>
+		<xs:attribute name="kv" type="koeficientType" use="optional"/>
+		<xs:attribute name="ksz" type="koeficientType" use="optional"/>
+		<xs:attribute name="ver" type="versionType" use="required"/>
+		<xs:attribute name="sw" type="notEmptyStringType" use="required"/>
+		<xs:attribute name="sx" type="coordinateAttrType" use="optional"/>
+		<xs:attribute name="sy" type="coordinateAttrType" use="optional"/>
+	</xs:complexType>
+	<xs:complexType name="pbremCollectionType">
+		<xs:sequence>
+			<xs:element name="pl" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="area" type="areaType"/>
+					</xs:sequence>
+					<xs:attribute name="id" type="basicIdAttrType" use="required"/>
+					<xs:attribute name="typ" type="typPravAttrType" use="required"/>
+					<xs:attribute name="popis" type="notEmptyStringType" use="optional"/>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="spozCollectionType">
+		<xs:sequence>
+			<xs:element name="pl" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="area" type="areaType"/>
+					</xs:sequence>
+					<xs:attribute name="id" type="basicIdAttrType" use="required"/>
+					<xs:attribute name="op" type="xs:integer" use="required"/>
+					<xs:attribute name="psz" type="notEmptyStringType" use="optional"/>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="vfpType">
+		<xs:annotation>
+			<xs:documentation>Kořen celého formátu</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="hlav" type="headerType">
+				<xs:annotation>
+					<xs:documentation>Hlavička</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ucastnici" type="ucastniciType" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Účastníci řízení</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="narok" type="narokType" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Vstupní nároky</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="navrh" type="navrhType" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Návrh nového uspořádání pozemků</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="pneres" type="pneresType" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Neřešené parcely</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="pmimo" type="outsideParcelType" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Parcely mimo obvod</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="bpej" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>BPEJ</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="pl" maxOccurs="unbounded">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="area" type="areaType"/>
+								</xs:sequence>
+								<xs:attribute name="id" type="basicIdAttrType" use="required"/>
+								<xs:attribute name="kod" type="bpejCodeAttrType" use="required"/>
+								<xs:attribute name="cena" type="priceAttrType" use="optional"/>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="bpejr2" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>BPEJ pro II. rozhodnutí</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="pl" maxOccurs="unbounded">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="area" type="areaType"/>
+								</xs:sequence>
+								<xs:attribute name="id" type="basicIdAttrType" use="required"/>
+								<xs:attribute name="kod" type="bpejCodeAttrType" use="required"/>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>			
+			<xs:element name="mdp" type="mdpType" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Mapa druhu pozemku</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="zs" type="zsType" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Zaměření skutečného stavu</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="opu" type="opuType" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Obvod pozemkové úpravy</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="por" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Plochy porostů</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="porost" type="porostType" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="pbre" type="pbremCollectionType" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Plochy nových věcných břemen</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="spoz" type="spozCollectionType" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Plochy společných zařízení</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="pm" type="pmType" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Přehledová mapa</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="mp" type="mpType" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Mapa průzkumu</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="meos" type="meosType" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Mapa erozního ohrožení souč. stav</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="meon" type="meonType" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Mapa erozního ohrožení navržený stav</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="hvpsz" type="hvpszType" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Hlavní výkres PSZ</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="zv" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>Zaměření výškopisu</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="zvbods" type="zvbodsType" minOccurs="0" maxOccurs="1">
+							<xs:annotation>
+								<xs:documentation>Body výškopisu</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="zvlins" type="zvlinsType" minOccurs="0" maxOccurs="1">
+							<xs:annotation>
+								<xs:documentation>Linie profilů</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="zvareas" type="zvareasType" minOccurs="0" maxOccurs="1">
+							<xs:annotation>
+								<xs:documentation>Vymezení plochy pro zaměření výškopisu</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="vfp" type="vfpType"/>
+</xs:schema>
