@@ -20,7 +20,20 @@ Index: ogr/ogrsf_frmts/gml/gmlhandler.cpp
 ===================================================================
 --- ogr/ogrsf_frmts/gml/gmlhandler.cpp	(revision 33370)
 +++ ogr/ogrsf_frmts/gml/gmlhandler.cpp	(working copy)
-@@ -1263,7 +1263,14 @@
+@@ -830,7 +830,11 @@
+             m_pszKieli = pszAttrVal;
+             pszAttrVal = NULL;
+         }
+-
++        else if ( eAppSchemaType == APPSCHEMA_VFP)
++        {
++            m_poReader->SetFeaturePropertyDirectly( pszAttrKey, pszAttrVal, -1 );
++            pszAttrVal = NULL;
++        }
+         /* Should we report all attributes ? */
+         else if( m_poReader->ReportAllAttributes() && !poClass->IsSchemaLocked() )
+         {
+@@ -1263,7 +1267,14 @@
          /* the schemas of MTKGML don't have (string) width, so don't set it */
          m_poReader->SetWidthFlag(false);
      }
@@ -36,7 +49,19 @@ Index: ogr/ogrsf_frmts/gml/gmlhandler.cpp
      stateStack[0] = STATE_DEFAULT;
  
      return OGRERR_NONE;
-@@ -1450,6 +1457,60 @@
+@@ -1335,6 +1346,11 @@
+                 if( pszGID )
+                     m_poReader->SetFeaturePropertyDirectly( "gid", pszGID, -1, GMLPT_String );
+             }
++            else if( eAppSchemaType == APPSCHEMA_VFP )
++            {
++                m_poReader->PushFeature( pszName, NULL, nClassIndex );
++                DealWithAttributes(pszName, nLenName, attr);
++            }
+             else
+                 m_poReader->PushFeature( pszName, GetFID(attr), nClassIndex );
+ 
+@@ -1450,6 +1466,114 @@
  }
  
  /************************************************************************/
@@ -94,27 +119,86 @@ Index: ogr/ogrsf_frmts/gml/gmlhandler.cpp
 +}
 +
 +/************************************************************************/
++/*                       ParseVFPPolygon()                              */
++/************************************************************************/
++
++CPLXMLNode* GMLHandler::ParseVFPPolygon(CPLXMLNode *psGML)
++{
++    std::string osCoordinates;
++    CPLXMLNode *pcNode;
++
++    pcNode = CPLSearchXMLNode(psGML, "c");
++    if (pcNode)
++    {
++        const char *x, *y;
++        char *pszPoint;
++        do
++        {
++            x = CPLGetXMLValue(pcNode, "x", NULL);
++            y = CPLGetXMLValue(pcNode, "y", NULL);
++            if (!x || !y)
++            {
++                /* TODO: warning */
++                continue;
++            }
++
++            if (!osCoordinates.empty())
++                osCoordinates += " ";
++            pszPoint = CPLStrdup(CPLSPrintf("-%s -%s", y, x));
++            osCoordinates += pszPoint;
++            CPLFree(pszPoint);
++            
++            pcNode = pcNode->psNext;
++        } while (pcNode);
++         
++    }
++    
++    if (!osCoordinates.empty())
++    {
++        char* pszGeometry;
++
++        pszGeometry = CPLStrdup(CPLSPrintf(
++            "<gml:Polygon><gml:outerBoundaryIs><gml:LinearRing><gml:posList>%s</gml:posList></gml:LinearRing></gml:outerBoundaryIs></gml:Polygon>",
++            osCoordinates.c_str()));
++        CPLDestroyXMLNode(psGML);
++        psGML = CPLParseXMLString(pszGeometry);
++    }
++    else
++    {
++        CPLDestroyXMLNode(psGML);
++        psGML = NULL;
++    }
++
++    return psGML;
++}
++
++/************************************************************************/
  /*                         endElementGeometry()                         */
  /************************************************************************/
  OGRErr GMLHandler::endElementGeometry()
-@@ -1497,6 +1558,11 @@
+@@ -1497,6 +1621,15 @@
          {
              psInterestNode = ParseAIXMElevationPoint(psInterestNode);
          }
-+        else if ( eAppSchemaType == APPSCHEMA_VFP && psInterestNode != NULL &&
-+            strcmp(psInterestNode->pszValue, "lin") == 0 )
++        else if ( eAppSchemaType == APPSCHEMA_VFP && psInterestNode != NULL)
 +        {
-+            psInterestNode = ParseVFPLineString(psInterestNode);
++            if ( strcmp(psInterestNode->pszValue, "lin") == 0 )
++                psInterestNode = ParseVFPLineString(psInterestNode);
++            else if ( strcmp(psInterestNode->pszValue, "area") == 0 )
++                psInterestNode = ParseVFPPolygon(psInterestNode);
++            else
++                ; /* TODO */
 +        }
          else if ( eAppSchemaType == APPSCHEMA_MTKGML && psInterestNode != NULL )
          {
              if( strcmp(psInterestNode->pszValue, "Murtoviiva") == 0 )
-@@ -1871,5 +1937,9 @@
+@@ -1871,5 +2004,10 @@
            strcmp( pszElement, "Murtoviiva") == 0 ) )
          return true;
  
 +    if ( eAppSchemaType == APPSCHEMA_VFP &&
-+         strcmp( pszElement, "lin") == 0)
++         ( strcmp( pszElement, "lin") == 0 ||
++           strcmp( pszElement, "area") == 0 ) )
 +        return true;
 +    
      return false;
@@ -133,11 +217,12 @@ Index: ogr/ogrsf_frmts/gml/gmlreaderp.h
  } GMLAppSchemaType;
  
  class GMLHandler
-@@ -161,6 +162,7 @@
+@@ -161,6 +162,8 @@
  
      OGRErr     startElementGeometry(const char *pszName, int nLenName, void* attr);
      CPLXMLNode* ParseAIXMElevationPoint(CPLXMLNode*);
 +    CPLXMLNode* ParseVFPLineString(CPLXMLNode*);
++    CPLXMLNode* ParseVFPPolygon(CPLXMLNode*);
      OGRErr     endElementGeometry();
      OGRErr     dataHandlerGeometry(const char *data, int nLen);
  

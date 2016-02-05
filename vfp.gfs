@@ -6,58 +6,78 @@
     <GeometryType>100</GeometryType> 
     <PropertyDefn>
       <Name>id</Name>
-      <ElementPath>@id</ElementPath>
+      <ElementPath>id</ElementPath>
       <Type>Integer</Type>
     </PropertyDefn>
     <PropertyDefn>
       <Name>jm</Name>
-      <ElementPath>uca@jm</ElementPath>
+      <ElementPath>jm</ElementPath>
       <Type>String</Type>
     </PropertyDefn>
     <PropertyDefn>
       <Name>pr</Name>
-      <ElementPath>uca@pr</ElementPath>
+      <ElementPath>pr</ElementPath>
       <Type>String</Type>
     </PropertyDefn>
     <PropertyDefn>
       <Name>naz</Name>
-      <ElementPath>uca@naz</ElementPath>
+      <ElementPath>naz</ElementPath>
       <Type>String</Type>
     </PropertyDefn>
     <PropertyDefn>
       <Name>rc</Name>
-      <ElementPath>uca@rc</ElementPath>
-      <Type>Integer</Type>
+      <ElementPath>rc</ElementPath>
+      <Type>String</Type>
+    </PropertyDefn>
+    <PropertyDefn>
+      <Name>tpj</Name>
+      <ElementPath>tpj</ElementPath>
+      <Type>String</Type>
     </PropertyDefn>
     <PropertyDefn>
       <Name>op_id</Name>
-      <ElementPath>uca@op_id</ElementPath>
+      <ElementPath>op_id</ElementPath>
       <Type>Integer</Type>
     </PropertyDefn>
     <PropertyDefn>
       <Name>email</Name>
-      <ElementPath>uca@email</ElementPath>
+      <ElementPath>email</ElementPath>
       <Type>String</Type>
     </PropertyDefn>
     <PropertyDefn>
       <Name>tel</Name>
-      <ElementPath>uca@tel</ElementPath>
+      <ElementPath>tel</ElementPath>
       <Type>Integer</Type>
     </PropertyDefn>
     <PropertyDefn>
       <Name>ul</Name>
-      <ElementPath>uca@ul</ElementPath>
+      <ElementPath>ul</ElementPath>
       <Type>String</Type>
     </PropertyDefn>
     <PropertyDefn>
+      <Name>cd</Name>
+      <ElementPath>cd</ElementPath>
+      <Type>Integer</Type>
+    </PropertyDefn>
+    <PropertyDefn>
       <Name>ob</Name>
-      <ElementPath>uca@ob</ElementPath>
+      <ElementPath>ob</ElementPath>
       <Type>String</Type>
     </PropertyDefn>
     <PropertyDefn>
       <Name>psc</Name>
-      <ElementPath>uca@psc</ElementPath>
+      <ElementPath>psc</ElementPath>
       <Type>Integer</Type>
+    </PropertyDefn>
+    <PropertyDefn>
+      <Name>okr</Name>
+      <ElementPath>okr</ElementPath>
+      <Type>String</Type>
+    </PropertyDefn>
+    <PropertyDefn>
+      <Name>sta</Name>
+      <ElementPath>sta</ElementPath>
+      <Type>String</Type>
     </PropertyDefn>
   </GMLFeatureClass>
   <!-- narok -->
@@ -65,29 +85,31 @@
     <Name>narok_lv_par</Name>
     <ElementPath>narok|lv|par</ElementPath>
     <SRSName>urn:ogc:def:crs:EPSG::5514</SRSName>
+    <GeometryType>Polygon</GeometryType>
     <PropertyDefn>
       <Name>parid</Name>
-      <ElementPath>pa@parid</ElementPath>
+      <ElementPath>parid</ElementPath>
       <Type>Integer</Type>
+      <SubType>Integer64</SubType>
     </PropertyDefn>
     <PropertyDefn>
       <Name>vymo</Name>
-      <ElementPath>pa@vymo</ElementPath>
+      <ElementPath>vymo</ElementPath>
       <Type>Integer</Type>
     </PropertyDefn>
     <PropertyDefn>
       <Name>vzd</Name>
-      <ElementPath>pa@vzd</ElementPath>
+      <ElementPath>vzd</ElementPath>
       <Type>Integer</Type>
     </PropertyDefn>
     <PropertyDefn>
       <Name>cir</Name>
-      <ElementPath>pa@cir</ElementPath>
+      <ElementPath>cir</ElementPath>
       <Type>Integer</Type>
     </PropertyDefn>
     <PropertyDefn>
       <Name>vymg</Name>
-      <ElementPath>pa@vymg</ElementPath>
+      <ElementPath>vymg</ElementPath>
       <Type>Real</Type>
     </PropertyDefn>
   </GMLFeatureClass>
@@ -99,7 +121,7 @@
     <GeometryType>LineString</GeometryType>
     <PropertyDefn>
       <Name>typ</Name>
-      <ElementPath>@typ</ElementPath>
+      <ElementPath>typ</ElementPath>
       <Type>Integer</Type>
     </PropertyDefn>
   </GMLFeatureClass>
