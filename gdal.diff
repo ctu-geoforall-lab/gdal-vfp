@@ -1,6 +1,6 @@
 Index: data/gml_registry.xml
 ===================================================================
---- data/gml_registry.xml	(revision 33370)
+--- data/gml_registry.xml	(revision 33380)
 +++ data/gml_registry.xml	(working copy)
 @@ -55,4 +55,13 @@
                       elementValue="ST_UVOH"
@@ -18,7 +18,7 @@ Index: data/gml_registry.xml
  </gml_registry>
 Index: ogr/ogrsf_frmts/gml/gmlhandler.cpp
 ===================================================================
---- ogr/ogrsf_frmts/gml/gmlhandler.cpp	(revision 33370)
+--- ogr/ogrsf_frmts/gml/gmlhandler.cpp	(revision 33380)
 +++ ogr/ogrsf_frmts/gml/gmlhandler.cpp	(working copy)
 @@ -830,7 +830,11 @@
              m_pszKieli = pszAttrVal;
@@ -205,7 +205,7 @@ Index: ogr/ogrsf_frmts/gml/gmlhandler.cpp
  }
 Index: ogr/ogrsf_frmts/gml/gmlreaderp.h
 ===================================================================
---- ogr/ogrsf_frmts/gml/gmlreaderp.h	(revision 33370)
+--- ogr/ogrsf_frmts/gml/gmlreaderp.h	(revision 33380)
 +++ ogr/ogrsf_frmts/gml/gmlreaderp.h	(working copy)
 @@ -108,7 +108,8 @@
      APPSCHEMA_GENERIC,
@@ -228,7 +228,7 @@ Index: ogr/ogrsf_frmts/gml/gmlreaderp.h
  
 Index: ogr/ogrsf_frmts/gml/ogrgmldatasource.cpp
 ===================================================================
---- ogr/ogrsf_frmts/gml/ogrgmldatasource.cpp	(revision 33370)
+--- ogr/ogrsf_frmts/gml/ogrgmldatasource.cpp	(revision 33380)
 +++ ogr/ogrsf_frmts/gml/ogrgmldatasource.cpp	(working copy)
 @@ -256,7 +256,8 @@
  bool OGRGMLDataSource::CheckHeader(const char* pszStr)
